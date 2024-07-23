@@ -4,7 +4,6 @@ pragma solidity ^0.8.11;
 
 import "./CommandBuilder.sol";
 
-
 abstract contract VM {
     using CommandBuilder for bytes[];
 
@@ -18,15 +17,9 @@ abstract contract VM {
 
     uint256 constant SHORT_COMMAND_FILL = 0x000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
-    error ExecutionFailed(
-        uint256 command_index,
-        address target,
-        string message
-    );
+    error ExecutionFailed(uint256 command_index, address target, string message);
 
-    function _execute(bytes32[] calldata commands, bytes[] memory state)
-      internal returns (bytes[] memory)
-    {
+    function _execute(bytes32[] calldata commands, bytes[] memory state) internal returns (bytes[] memory) {
         bytes32 command;
         uint256 flags;
         bytes32 indices;
@@ -39,7 +32,7 @@ abstract contract VM {
             command = commands[i];
             flags = uint256(uint8(bytes1(command << 32)));
 
-            if (flags & FLAG_EXTENDED_COMMAND != 0) { 
+            if (flags & FLAG_EXTENDED_COMMAND != 0) {
                 indices = commands[i++];
             } else {
                 indices = bytes32(uint256(command << 40) | SHORT_COMMAND_FILL);
@@ -104,7 +97,9 @@ abstract contract VM {
             } else {
                 state = state.writeOutputs(bytes1(command << 88), outdata);
             }
-            unchecked{++i;}
+            unchecked {
+                ++i;
+            }
         }
         return state;
     }
