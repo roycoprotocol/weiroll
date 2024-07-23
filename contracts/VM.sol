@@ -18,17 +18,11 @@ abstract contract VM {
 
     uint256 constant SHORT_COMMAND_FILL = 0x000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
-    address immutable self;
-
     error ExecutionFailed(
         uint256 command_index,
         address target,
         string message
     );
-
-    constructor() {
-        self = address(this);
-    }
 
     function _execute(bytes32[] calldata commands, bytes[] memory state)
       internal returns (bytes[] memory)
@@ -45,21 +39,14 @@ abstract contract VM {
             command = commands[i];
             flags = uint256(uint8(bytes1(command << 32)));
 
-            if (flags & FLAG_EXTENDED_COMMAND != 0) {
+            if (flags & FLAG_EXTENDED_COMMAND != 0) { 
                 indices = commands[i++];
             } else {
                 indices = bytes32(uint256(command << 40) | SHORT_COMMAND_FILL);
             }
 
             if (flags & FLAG_CT_MASK == FLAG_CT_DELEGATECALL) {
-                (success, outdata) = address(uint160(uint256(command))).delegatecall( // target
-                    // inputs
-                    state.buildInputs(
-                        //selector
-                        bytes4(command),
-                        indices
-                    )
-                );
+                revert("Delegatecall is disabled");
             } else if (flags & FLAG_CT_MASK == FLAG_CT_CALL) {
                 (success, outdata) = address(uint160(uint256(command))).call( // target
                     // inputs
