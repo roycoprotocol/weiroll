@@ -13,7 +13,16 @@ const appendDecimals = (amount) => ethers.utils.parseEther(amount.toString());
 describe("VM", function () {
   const testString = "Hello, world!";
 
-  let events, vm, math, strings, stateTest, sender, revert, vmLibrary, token, payable;
+  let events,
+    vm,
+    math,
+    strings,
+    stateTest,
+    sender,
+    revert,
+    vmLibrary,
+    token,
+    payable;
   let supply = ethers.BigNumber.from("100000000000000000000");
   let eventsContract;
 
@@ -54,136 +63,145 @@ describe("VM", function () {
     return vm.execute(encodedCommands, state);
   }
 
-  it("Should return msg.sender", async () => {
-    const [caller] = await ethers.getSigners();
-    const planner = new weiroll.Planner();
-    const msgSender = planner.add(sender.sender());
-    planner.add(events.logAddress(msgSender));
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should return msg.sender", async () => {
+  //   const [caller] = await ethers.getSigners();
+  //   const planner = new weiroll.Planner();
+  //   const msgSender = planner.add(sender.sender());
+  //   planner.add(events.logAddress(msgSender));
 
-    const { commands, state } = planner.plan();
+  //   const { commands, state } = planner.plan();
 
-    const tx = await vm.execute(commands, state);
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogAddress")
-      .withArgs(caller.address);
+  //   const tx = await vm.execute(commands, state);
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogAddress")
+  //     .withArgs(caller.address);
 
-    const receipt = await tx.wait();
-    console.log(`Msg.sender: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`Msg.sender: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
-  it("Should execute a simple addition program", async () => {
-    const planner = new weiroll.Planner();
-    let a = 1,
-      b = 1;
-    for (let i = 0; i < 8; i++) {
-      const ret = planner.add(math.add(a, b));
-      a = b;
-      b = ret;
-    }
-    planner.add(events.logUint(b));
-    const { commands, state } = planner.plan();
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should execute a simple addition program", async () => {
+  //   const planner = new weiroll.Planner();
+  //   let a = 1,
+  //     b = 1;
+  //   for (let i = 0; i < 8; i++) {
+  //     const ret = planner.add(math.add(a, b));
+  //     a = b;
+  //     b = ret;
+  //   }
+  //   planner.add(events.logUint(b));
+  //   const { commands, state } = planner.plan();
 
-    const tx = await vm.execute(commands, state);
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogUint")
-      .withArgs(55);
+  //   const tx = await vm.execute(commands, state);
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogUint")
+  //     .withArgs(55);
 
-    const receipt = await tx.wait();
-    console.log(`Array sum: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`Array sum: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
-  it("Should execute a string length program", async () => {
-    const planner = new weiroll.Planner();
-    const len = planner.add(strings.strlen(testString));
-    planner.add(events.logUint(len));
-    const { commands, state } = planner.plan();
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should execute a string length program", async () => {
+  //   const planner = new weiroll.Planner();
+  //   const len = planner.add(strings.strlen(testString));
+  //   planner.add(events.logUint(len));
+  //   const { commands, state } = planner.plan();
 
-    const tx = await vm.execute(commands, state);
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogUint")
-      .withArgs(13);
+  //   const tx = await vm.execute(commands, state);
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogUint")
+  //     .withArgs(13);
 
-    const receipt = await tx.wait();
-    console.log(`String concatenation: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`String concatenation: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
-  it("Should concatenate two strings", async () => {
-    const planner = new weiroll.Planner();
-    const result = planner.add(strings.strcat(testString, testString));
-    planner.add(events.logString(result));
-    const { commands, state } = planner.plan();
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should concatenate two strings", async () => {
+  //   const planner = new weiroll.Planner();
+  //   const result = planner.add(strings.strcat(testString, testString));
+  //   planner.add(events.logString(result));
+  //   const { commands, state } = planner.plan();
 
-    const tx = await vm.execute(commands, state);
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogString")
-      .withArgs(testString + testString);
+  //   const tx = await vm.execute(commands, state);
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogString")
+  //     .withArgs(testString + testString);
 
-    const receipt = await tx.wait();
-    console.log(`String concatenation: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`String concatenation: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
-  it("Should sum an array of uints", async () => {
-    const planner = new weiroll.Planner();
-    const result = planner.add(math.sum([1, 2, 3]));
-    planner.add(events.logUint(result));
-    const { commands, state } = planner.plan();
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should sum an array of uints", async () => {
+  //   const planner = new weiroll.Planner();
+  //   const result = planner.add(math.sum([1, 2, 3]));
+  //   planner.add(events.logUint(result));
+  //   const { commands, state } = planner.plan();
 
-    const tx = await vm.execute(commands, state);
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogUint")
-      .withArgs(6);
+  //   const tx = await vm.execute(commands, state);
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogUint")
+  //     .withArgs(6);
 
-    const receipt = await tx.wait();
-    console.log(`String concatenation: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`String concatenation: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
-  it("Should execute payable function", async () => {
-    const amount = appendDecimals(123);
-    const planner = new weiroll.Planner();
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should execute payable function", async () => {
+  //   const amount = appendDecimals(123);
+  //   const planner = new weiroll.Planner();
 
-    planner.add(payable.pay().withValue(amount));
-    const balance = planner.add(payable.balance());
-    planner.add(events.logUintPayable(balance));
-    const { commands, state } = planner.plan();
+  //   planner.add(payable.pay().withValue(amount));
+  //   const balance = planner.add(payable.balance());
+  //   planner.add(events.logUintPayable(balance));
+  //   const { commands, state } = planner.plan();
 
-    const tx = await vm.execute(commands, state, { value: amount });
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogUint")
-      .withArgs(amount);
-    expect(await ethers.provider.getBalance(payable.address)).to.be.equal(amount);
+  //   const tx = await vm.execute(commands, state, { value: amount });
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogUint")
+  //     .withArgs(amount);
+  //   expect(await ethers.provider.getBalance(payable.address)).to.be.equal(
+  //     amount
+  //   );
 
-    const receipt = await tx.wait();
-    console.log(`Payable: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`Payable: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
-  it("Should pass and return raw state to functions", async () => {
-    const commands = [
-      [stateTest, "addSlots", "0x00000102feffff", "0xfe"],
-      [events, "logUint", "0x0000ffffffffff", "0xff"],
-    ];
-    const state = [
-      // dest slot index
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      // src1 slot index
-      "0x0000000000000000000000000000000000000000000000000000000000000003",
-      // src2 slot index
-      "0x0000000000000000000000000000000000000000000000000000000000000004",
-      // src1
-      "0x0000000000000000000000000000000000000000000000000000000000000001",
-      // src2
-      "0x0000000000000000000000000000000000000000000000000000000000000002",
-    ];
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should pass and return raw state to functions", async () => {
+  //   const commands = [
+  //     [stateTest, "addSlots", "0x00000102feffff", "0xfe"],
+  //     [events, "logUint", "0x0000ffffffffff", "0xff"],
+  //   ];
+  //   const state = [
+  //     // dest slot index
+  //     "0x0000000000000000000000000000000000000000000000000000000000000000",
+  //     // src1 slot index
+  //     "0x0000000000000000000000000000000000000000000000000000000000000003",
+  //     // src2 slot index
+  //     "0x0000000000000000000000000000000000000000000000000000000000000004",
+  //     // src1
+  //     "0x0000000000000000000000000000000000000000000000000000000000000001",
+  //     // src2
+  //     "0x0000000000000000000000000000000000000000000000000000000000000002",
+  //   ];
 
-    const tx = await execute(commands, state);
-    await expect(tx)
-      .to.emit(eventsContract.attach(vm.address), "LogUint")
-      .withArgs(
-        "0x0000000000000000000000000000000000000000000000000000000000000003"
-      );
+  //   const tx = await execute(commands, state);
+  //   await expect(tx)
+  //     .to.emit(eventsContract.attach(vm.address), "LogUint")
+  //     .withArgs(
+  //       "0x0000000000000000000000000000000000000000000000000000000000000003"
+  //     );
 
-    const receipt = await tx.wait();
-    console.log(`State passing: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`State passing: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 
   it("Should perform a ERC20 transfer", async () => {
     let amount = supply.div(10);
@@ -213,14 +231,27 @@ describe("VM", function () {
     console.log(`Direct ERC20 transfer: ${receipt.gasUsed.toNumber()} gas`);
   });
 
-  it("Should propagate revert reasons", async () => {
+  it("Should revert if a delegatecall is attempted", async () => {
     const planner = new weiroll.Planner();
+    const msgSender = planner.add(sender.sender());
+    planner.add(events.logAddress(msgSender));
 
-    planner.add(revert.fail());
     const { commands, state } = planner.plan();
 
     await expect(vm.execute(commands, state)).to.be.revertedWith(
-      "Hello World!"
+      "Delegatecall is disabled"
     );
   });
+
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should propagate revert reasons", async () => {
+  //   const planner = new weiroll.Planner();
+
+  //   planner.add(revert.fail());
+  //   const { commands, state } = planner.plan();
+
+  //   await expect(vm.execute(commands, state)).to.be.revertedWith(
+  //     "Hello World!"
+  //   );
+  // });
 });
