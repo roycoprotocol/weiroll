@@ -231,6 +231,18 @@ describe("VM", function () {
     console.log(`Direct ERC20 transfer: ${receipt.gasUsed.toNumber()} gas`);
   });
 
+  it("Should revert if a delegatecall is attempted", async () => {
+    const planner = new weiroll.Planner();
+    const msgSender = planner.add(sender.sender());
+    planner.add(events.logAddress(msgSender));
+
+    const { commands, state } = planner.plan();
+
+    await expect(vm.execute(commands, state)).to.be.revertedWith(
+      "Delegatecall is disabled"
+    );
+  });
+
   // NOTE: This command will fail because delegatecall has been disabled.
   // it("Should propagate revert reasons", async () => {
   //   const planner = new weiroll.Planner();
