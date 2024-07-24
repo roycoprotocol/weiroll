@@ -10,10 +10,39 @@ async function deployLibrary(name) {
 
 const appendDecimals = (amount) => ethers.utils.parseEther(amount.toString());
 
+const changeDelegateCallToCall = (command) => {
+  // Check if the command string is valid
+  if (typeof command !== "string" || !command.startsWith("0x")) {
+    throw new Error("Invalid command string");
+  }
+
+  // Extract the parts of the command
+  const prefix = command.slice(0, 2); // '0x'
+  const sel = command.slice(2, 10); // Function selector
+  const inArgsOutArgAndTarget = command.slice(10); // Remaining part of the command
+
+  // Replace the flags byte with '01' (CALL)
+  const newFlags = "01";
+
+  // Construct the modified command
+  const modifiedCommand = `${prefix}${sel}${newFlags}${inArgsOutArgAndTarget}`;
+
+  return modifiedCommand;
+};
+
 describe("VM", function () {
   const testString = "Hello, world!";
 
-  let events, vm, math, strings, stateTest, sender, revert, vmLibrary, token, payable;
+  let events,
+    vm,
+    math,
+    strings,
+    stateTest,
+    sender,
+    revert,
+    vmLibrary,
+    token,
+    payable;
   let supply = ethers.BigNumber.from("100000000000000000000");
   let eventsContract;
 
@@ -150,7 +179,9 @@ describe("VM", function () {
     await expect(tx)
       .to.emit(eventsContract.attach(vm.address), "LogUint")
       .withArgs(amount);
-    expect(await ethers.provider.getBalance(payable.address)).to.be.equal(amount);
+    expect(await ethers.provider.getBalance(payable.address)).to.be.equal(
+      amount
+    );
 
     const receipt = await tx.wait();
     console.log(`Payable: ${receipt.gasUsed.toNumber()} gas`);
