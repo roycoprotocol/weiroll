@@ -52,25 +52,26 @@ describe("Tuple", function () {
   //   console.log(`Tuple return+slice: ${receipt.gasUsed.toNumber()} gas`);
   // });
 
-  it("Should perform a tuple return that's sliced before being fed to another function (second var)", async () => {
-    const commands = [
-      [multiReturn, "intTuple", "0x40ffffffffffff", "0x00"],
-      [tupler, "extractElement", "0x008001ffffffff", "0x00"],
-      [multiReturn, "tupleConsumer", "0x0000ffffffffff", "0xff"],
-    ];
+  // NOTE: This command will fail because delegatecall has been disabled.
+  // it("Should perform a tuple return that's sliced before being fed to another function (second var)", async () => {
+  //   const commands = [
+  //     [multiReturn, "intTuple", "0x40ffffffffffff", "0x00"],
+  //     [tupler, "extractElement", "0x008001ffffffff", "0x00"],
+  //     [multiReturn, "tupleConsumer", "0x0000ffffffffff", "0xff"],
+  //   ];
 
-    const state = [
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "0x0000000000000000000000000000000000000000000000000000000000000001",
-    ];
+  //   const state = [
+  //     "0x0000000000000000000000000000000000000000000000000000000000000000",
+  //     "0x0000000000000000000000000000000000000000000000000000000000000001",
+  //   ];
 
-    const tx = await execute(commands, state);
+  //   const tx = await execute(commands, state);
 
-    await expect(tx)
-      .to.emit(multiReturn.attach(vm.address), "Calculated")
-      .withArgs(0xdeed);
+  //   await expect(tx)
+  //     .to.emit(multiReturn.attach(vm.address), "Calculated")
+  //     .withArgs(0xdeed);
 
-    const receipt = await tx.wait();
-    console.log(`Tuple return+slice: ${receipt.gasUsed.toNumber()} gas`);
-  });
+  //   const receipt = await tx.wait();
+  //   console.log(`Tuple return+slice: ${receipt.gasUsed.toNumber()} gas`);
+  // });
 });
