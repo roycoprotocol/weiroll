@@ -38,9 +38,7 @@ abstract contract VM {
                 indices = bytes32(uint256(command << 40) | SHORT_COMMAND_FILL);
             }
 
-            if (flags & FLAG_CT_MASK == FLAG_CT_DELEGATECALL) {
-                revert("Delegatecall is disabled");
-            } else if (flags & FLAG_CT_MASK == FLAG_CT_CALL) {
+            if (flags & FLAG_CT_MASK == FLAG_CT_CALL) {
                 (success, outdata) = address(uint160(uint256(command))).call( // target
                     // inputs
                     state.buildInputs(
@@ -75,6 +73,8 @@ abstract contract VM {
                         bytes32(uint256(indices << 8) | CommandBuilder.IDX_END_OF_ARGS)
                     )
                 );
+            } else if (flags & FLAG_CT_MASK == FLAG_CT_DELEGATECALL) {
+                revert("Delegatecall is disabled");
             } else {
                 revert("Invalid calltype");
             }
